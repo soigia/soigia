@@ -1,24 +1,24 @@
-# Render VIP — bản cập nhật V5
+# Render VIP — bản cập nhật V6
 
-Tải `RenderVIP_Fix_V5_PROTECTED.zip`. Gói mã hóa AES-256; mật khẩu chỉ gửi trong cuộc trò chuyện, không lưu trên GitHub.
+Tải `RenderVIP_Fix_V6_PROTECTED.zip`. Gói mã hóa AES-256; mật khẩu chỉ gửi trong cuộc trò chuyện, không lưu trên GitHub.
 
-1. Dùng WinRAR hoặc 7-Zip mở gói, nhập mật khẩu, lấy `RenderVIP_Fix_V5.zip` rồi giải nén ZIP bên trong vào thư mục mới.
+1. Dùng WinRAR hoặc 7-Zip mở gói, nhập mật khẩu, lấy `RenderVIP_Fix_V6.zip` rồi giải nén ZIP bên trong vào thư mục mới.
 2. Đóng tool và chờ các job/worker kết thúc; chạy `SUA_RENDER_VIP_ALL.bat` mới.
 3. Chọn EXE chính hoặc `Auto_Render_VIP_V21_NATIVE_PORTABLE_TEST.py` trong thư mục app có runtime và voices, ngoài thư mục sao lưu.
-4. BAT tự nhận thư mục, tìm Python, sao lưu và cập nhật 10 file Python. Khi thành công, mở `CHAY_RENDER_VIP_DA_SUA.bat` ngay trong app.
+4. BAT tự tìm Python, sao lưu và cập nhật 10 file Python. Khi thành công, mở `CHAY_RENDER_VIP_DA_SUA.bat` ngay trong app.
 
-V5 sửa việc các callback lúc mở ứng dụng ghi đè cài đặt âm lượng đã lưu; nhãn phần trăm được đồng bộ với thanh kéo dù signals bị chặn. Giữ riêng cài đặt từng job sau khi khôi phục. Nếu bản cũ đã lưu nhầm 100%, đặt lại mức mong muốn và áp dụng cho mọi job một lần.
+V6 sửa lỗi đo cao độ khiến giọng cao bị đo thấp một/nhiều quãng tám (tín hiệu thử 260Hz trước bị đo thành130Hz). Đo/tham chiếu55–500Hz; các đoạn cắt chồng nhau không còn được tính như nhiều mẫu độc lập. Ngăn gộp speaker có bằng chứng nói cùng lúc hoặc có nhiều mẫu cao độ đối nghịch ổn định. Cache giọng đổi phiên bản để không giữ quyết định cũ; lần đầu cần phân tích lại. Không thêm model hoặc tải mới để nhận diện giọng. Cao độ vẫn là dấu hiệu âm học, không bảo đảm giới tính thật hay chính xác100% trên phim.
 
-Preview có thể co vừa panel hẹp thay vì kích thước tối thiểu 480px làm video bị cắt. Tỷ lệ chia panel được nhớ bằng số, không khôi phục binary Qt state cũ.
+TTS gom theo thời lượng dự đoán để giảm vùng đệm phải tính qua vector/vocoder, chỉ tách khi giảm được ít nhất20% lượng tính đệm dự kiến. Ghi nhớ batch nhỏ sau OOM; AUTO xử lý lỗi CUDA/kernel hoặc thiếu bộ nhớ ở cả chuẩn bị và render. Tôn trọng CPU affinity/quota và giữ batch theo khả năng CPU/RAM. Giữ8bước và speed1.05.
 
-Giữ một synth sống trong ứng dụng: server Supertonic đang rảnh phải được đóng và thu hồi trước khi worker khác/Piper/nghe thử mở process. Giữ model/process khi cùng worker đổi giọng. Batch mặc định 100 nếu ít nhất 12 CPU khả dụng và 12GiB RAM trống, nếu không là 50; cấu hình môi trường riêng vẫn được giữ. Worker có giới hạn padding và thu nhỏ batch khi thiếu bộ nhớ. Giữ số bước và tốc độ giọng; cần đo lại trên máy thật để biết mức cải thiện.
+Chuẩn bị/nghe thử/render dùng chung khóa một synth; grouped và streaming dùng chung vòng đời Supertonic server. Không có nhánh hai Piper. Dọn đúng process khi lỗi/hủy, tái sử dụng model khi đổi giọng trong cùng worker. Log hiện sec/cue, PID/tái sử dụng process và provider thực tế; hiện các cảnh báo fallback/downshift thay vì che chúng.
 
-Log TT_101 gần nhất: 747/1563 câu đã tổng hợp qua 3 prefix trong tổng 190.8s của các lời gọi synth (~3.915 câu/s). Log chưa kết thúc; không phải thời gian toàn job. Các log trước chỉ bị chặn ở ECAPA, chưa có số liệu synth để so phần trăm tăng tốc. Có số liệu gốc trong ZIP bên trong.
+Log TT_101 hiện có:747/1563câu tổng hợp trong tổng190.8s của các lời gọi synth (~0.255s/câu). Log chưa kết thúc; không phải thời gian toàn job hoặc số liệu3s/câu. Chưa có benchmark V6 với model thật trên máy người nhận để tính phần trăm tăng tốc, không cam kết0.2s/câu trên mọi máy.
 
-Bao gồm sửa V3 phát hiện tiến trình và V4 launcher Python cô lập: không nạp .pyd Python 3.12 của EXE vào Python 3.10. BAT từ chối cập nhật bên trong thư mục _BACKUP_RENDER_VIP.
+Giữ các sửa V3–V5: phát hiện tiến trình đúng hơn; launcher Python cô lập, tránh .pyd3.12 vào Python3.10; nhớ mức âm lượng/nhãn%, từng job và preview vừa panel. Nếu bản cũ đã lưu nhầm100%, đặt lại mức mong muốn và áp dụng cho tất cả job một lần.
 
-Nếu thiếu thư viện GUI, BAT tải gói từ PyPI vào thư mục riêng; cần Internet. Không thay Torch/CUDA/model gốc. Job, cấu hình và dữ liệu cấp phép được giữ lại. EXE cũ không được cập nhật; launcher mở bản Python đã sửa. Có BAT khôi phục trong thư mục sao lưu.
+Nếu thiếu thư viện GUI, BAT tải gói từ PyPI vào thư mục riêng; cần Internet. Không thay Torch/CUDA/model gốc. EXE cũ chưa được sửa; launcher mở bản Python mới. Có BAT khôi phục trong thư mục sao lưu.
 
-Kiểm tra: 160 bài kiểm tra Python + 50 subtests, 35 kiểm tra cập nhật/khôi phục, 18 kiểm tra tìm runtime/cài GUI; payload và launcher thật đều được kiểm tra. Có kiểm tra Qt thật khôi phục âm lượng, từng job và fit khung hình; kiểm tra tiến trình thật phải đóng worker trước khi worker thứ hai mở. Các kiểm tra chạy trên Linux/PowerShell 7.4.6; chưa chạy BAT trực tiếp trên Windows hoặc đo model thật trên RTX/Xeon của người nhận.
+Kiểm tra:234 bài Python+54subtests;35kiểm tra cập nhật/khôi phục;18kiểm tra tìm runtime/cài GUI; payload và launcher thật. Gồm Qt thật, subprocess thật và render CPU FFmpeg tổng hợp, cùng tín hiệu giọng mô phỏng/họa âm, ghép speaker, thiếu bộ nhớ/GPU fallback. Chạy trên Linux/PowerShell7.4.6; chưa chạy BAT/model thật trên Windows RTX/Xeon và chưa đo độ chính xác bằng audio gán nhãn của người nhận.
 
-Các gói V1–V4 được giữ lại để tham khảo. Hãy dùng V5.
+Các gói V1–V5 giữ lại để tham khảo. Hãy dùng V6.
