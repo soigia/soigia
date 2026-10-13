@@ -1,28 +1,28 @@
-# Render VIP — bản cập nhật V8
+# Render VIP — bản cập nhật V9
 
-Tải `RenderVIP_Fix_V8_PROTECTED.zip`. Gói mã hóa AES-256; mật khẩu được gửi riêng trong cuộc trò chuyện, không lưu trên GitHub.
+Tải `RenderVIP_Fix_V9_PROTECTED.zip`. Gói mã hóa AES-256; mật khẩu được gửi riêng trong cuộc trò chuyện, không lưu trên GitHub.
 
-1. Mở bằng WinRAR/7-Zip, nhập mật khẩu, lấy `RenderVIP_Fix_V8.zip` và giải nén ZIP bên trong.
+1. Mở bằng WinRAR/7-Zip, nhập mật khẩu rồi giải nén `RenderVIP_Fix_V9.zip` ở bên trong.
 2. Đóng tool và chờ các job/worker dừng; chạy `SUA_RENDER_VIP_ALL.bat` mới.
-3. Chọn EXE chính hoặc `Auto_Render_VIP_V21_NATIVE_PORTABLE_TEST.py` của tool, trong thư mục app có runtime/voices, ngoài `_BACKUP_RENDER_VIP_...`.
-4. BAT kiểm tra phiên bản, sao lưu và cập nhật 12 nguồn Python. Khi thành công, mở `CHAY_RENDER_VIP_DA_SUA.bat` trong thư mục app. EXE cũ vẫn là bản cũ.
+3. Chọn EXE chính hoặc `Auto_Render_VIP_V21_NATIVE_PORTABLE_TEST.py` của tool trong thư mục app có runtime/voices, ngoài `_BACKUP_RENDER_VIP_...`.
+4. BAT kiểm tra phiên bản, sao lưu và cập nhật 15 nguồn Python. Khi thành công, mở `CHAY_RENDER_VIP_DA_SUA.bat` trong thư mục app. EXE cũ vẫn là bản cũ.
 
-V8 thêm ô nhập Gốc/AI 0–200%, nhớ theo job/preset và đồng bộ thanh kéo. 200% là biên độ 2× (+6 dB) trước limiter; âm thanh chạm giới hạn đỉnh sẽ được hạn chế để giảm vỡ tiếng. Preview trực tiếp còn giới hạn 100%.
+V9 tập trung vào vòng đời một worker tổng hợp giọng, xử lý âm thanh có giới hạn bộ nhớ, hiệu chỉnh cấu hình TTS theo máy và đo thời gian từng công đoạn. Giữ nguyên 8 bước tổng hợp, speed giọng 1.05 và chất lượng CQ/CRF18. Không mặc định nhiều luồng CPU hơn sẽ nhanh hơn; không tự thay Torch/CUDA hoặc model.
 
-Tốc độ DONE 0,5–2,0×, mặc định 1,0×, đổi đồng bộ video/âm thanh/phụ đề; giữ cao độ và chỉ đổi nhịp mỗi nguồn audio một lần. Dùng trong SRT Master, Video Master/READY và REUP. Tốc độ phát không đồng nghĩa mức tăng tốc render. TTS vẫn một worker, giữ nguyên bước/chất lượng giọng.
+Cache giọng LRU mặc định tối đa 512 MiB, chừa 4 GiB trống và dự trù đĩa của job đang chạy. Dùng lại WAV đã xác minh khi đổi gain/crop/Speed; thay text/model/style/thuật toán/route thì key đổi. Cache lỗi/thiếu đĩa được bỏ qua; có thể tắt bằng `AUTODUBBING_PIPER_CACHE=0`.
 
-Ghép SRT theo mã video và quốc gia/ngôn ngữ, kể cả tiêu đề bản dịch khác. Đổi quốc gia kiểm tra SRT trước khi đổi metadata/giọng; thiếu/trùng/sai sẽ báo rõ. Tránh tạo job trùng quốc gia. Có thể chọn thủ công SRT ngoài thư mục quét để giải quyết trường hợp chưa tìm thấy; thông tin giọng đã chọn được giữ cùng quốc gia.
+Giữ model Supertonic còn khỏe/rảnh giữa các job; chuẩn bị cửa sổ SRT liên tục; cache preflight Nemotron; resample trong process; bỏ audio xuất khi Gốc=0; decode tiếng gốc một lần lên WORK khi đủ dung lượng; trim trong encode đầu và gộp tempo AI vào mix. FINAL có thể ghép checkpoint trực tiếp khi đủ điều kiện. Hiệu chỉnh mới thử số luồng CPU, chưa tự chọn batch/provider thắng. Report có GPU/NVENC/Video Decode khi driver cung cấp; chưa có benchmark V9 trên máy người dùng.
 
-Anti dùng một mức chỉnh màu nhẹ cho toàn job/checkpoint/chạy tiếp. REUP giữ lựa chọn bật/tắt; không tạo thông tin điện thoại/ngày quay giả. Sửa bộ lọc crop/blur/flip/logo/SRT/Anti bị áp hai lần khi trim video đã render, và giữ FPS theo lưới hình gốc. Các sửa này bảo đảm xử lý nhất quán; không chứng minh nguyên nhân thiếu view hoặc cam kết tránh kiểm tra nội dung trùng của YouTube.
+Log mới có đường dẫn `V9 PERFORMANCE REPORT` đến JSON theo job. Stage chạy chồng/lồng nhau nên không cộng thời gian stage thành thời gian DONE. So lại cùng video/SRT/giọng/thiết lập và Speed=1, rồi batch 2–3 job. Lưu cả log và JSON để xác định điểm nghẽn còn lại.
 
-Bộ điều phối không giảm luồng video chỉ vì câu dài hoặc callback của một batch bị lặp. So throughput tương đương và áp lực CPU đo được; giữ nguồn lực khi video có backlog. Chưa có benchmark V8 trên máy người nhận để cam kết số giây/câu hoặc phút/job.
+Log TT_101 thực tế cho thấy V7 hoàn tất trong 9 phút 51 giây, còn V8 mất 25 phút 06 giây. Thời gian tổng hợp 1563 câu lần lượt là 422,1 và 722,7 giây. Cả hai có 21 yêu cầu, 28 batch nội bộ và cùng tổng thời lượng WAV thô 3946,914 giây. V8 ở lần chạy này chậm hơn; log chưa đủ dữ liệu để kết luận nguyên nhân. V9 chưa có benchmark model thật trên Windows chứng minh giảm bao nhiêu phút/job.
 
-Giữ các sửa V3–V7: launcher Python cô lập; đường dẫn portable; lưu job/âm lượng/preview; một synth; tái sử dụng Supertonic; batching và GPU/CPU fallback; sửa cao độ và logic speaker. Model/runtime/bản quyền không bị thay. Nếu thiếu GUI, BAT tải thư viện từ PyPI vào thư mục riêng, cần Internet. Có BAT khôi phục trong backup.
+Giữ các chức năng V8: ô nhập Gốc/AI 0–200%; Speed DONE 0,5–2,0× đồng bộ video/âm thanh/phụ đề; ghép SRT theo mã video và quốc gia/ngôn ngữ trong tên hoặc thư mục; xử lý màu/trim/FPS nhất quán. 200% là biên độ 2× trước limiter, không phải cam kết độ to cảm nhận gấp đôi. Speed DONE là tốc độ phát thành phẩm, khác với tốc độ render. Ghép SRT chưa nhận diện ngôn ngữ từ nội dung câu.
 
-So log TT_101: 747 câu đầu cũ190,8s → V7179,5s (giảm11,3s≈5,9%). V7 đủ1563câu, tổng hợp422,1s, cảjob591s. Khác thiết lập hiệnSRT/cache nên chưa phải benchmark kiểm soát. Thời lượng WAV3s không phải thời gian máy tính tổng hợp1câu.
+Giữ các sửa V3–V7: launcher Python cô lập; đường dẫn portable; lưu job/âm lượng/preview; một synth; batching và GPU/CPU fallback; sửa cao độ và logic speaker. Model/runtime/bản quyền không bị thay. Nếu thiếu GUI, BAT tải thư viện từ PyPI vào thư mục riêng, cần Internet. Có BAT khôi phục trong backup.
 
-Kiểm tra Qt/subprocess/CPU FFmpeg và bộ cài chạy trong môi trường Linux/PowerShell7.4.6. Chưa chạy BAT/model thật trên Windows RTX5060Ti/Xeon hoặc đo độ chính xác trên audio người nhận gán nhãn. Nên thử một video ngắn trước batch lớn.
+Kết quả kiểm tra cuối cùng nằm trong `BAO_CAO_KIEM_TRA.json` của gói. Kiểm tra Qt/subprocess/CPU FFmpeg và bộ cài chạy trên Linux/PowerShell 7.4.6. Chưa chạy BAT/model thật trên Windows RTX 5060 Ti/Xeon hoặc đo độ chính xác trên audio người dùng đã gán nhãn.
 
-Giữ các gói V1–V7 để tham khảo; dùng V8 mới. Không đăng mã Python hoặc mật khẩu ở dạng đọc được trên GitHub.
+Nguồn V9 đã qua 537 kiểm tra chính và 94 kiểm tra phụ; đóng gói/payload 23 kiểm tra, bộ cài/khôi phục 35 và tự tìm Python/cô lập GUI 20 kiểm tra đạt. Đã kiểm tra payload BAT và launcher thực. Gói có báo cáo triển khai và đối chiếu đầy đủ log V7/V8.
 
-Kết quả V8:367 bài Python+94 kiểm tra phụ;18 kiểm tra builder;35 cập nhật/khôi phục;20 runtime/GUI;payload BAT và launcher thật đều đạt.
+Giữ các gói V1–V8 để tham khảo. Không đăng mã Python hoặc mật khẩu ở dạng đọc được trên GitHub.
